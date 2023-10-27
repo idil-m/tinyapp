@@ -59,6 +59,7 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   const longuRL =  req.body.longURL
@@ -78,7 +79,17 @@ app.post("/urls/:id/delete", (req, res) =>{
   }
 });
 
-app.get("/u/:id", (req, res) => {
+app.post("/urls/:id", (req, res) =>{
+  const id = req.params.id;
+  const longURL = req.body.longURL;
+  if(urlDatabase[id]){
+    urlDatabase[id] =longURL;
+    res.redirect("/urls");
+  }
+
+  });
+
+  app.get("/u/:id", (req, res) => {
   const id = req.params.id
   const longURL = urlDatabase[id]
   res.redirect(longURL);
