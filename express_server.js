@@ -108,7 +108,16 @@ app.post("/urls/:id", (req, res) =>{
     const username = req.body.username
     res.clearCookie("username",username);
     res.redirect("/urls");
-  })
+  });
+
+  app.get("/register", (req,res) =>{
+    const templateVars = {
+    username: req.cookies["username"] // @TODO THIS CRASHES APP
+
+   }
+   res.render("registration", templateVars)
+  });
+
 
   app.get("/u/:id", (req, res) => {
   const id = req.params.id
