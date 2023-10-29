@@ -146,16 +146,16 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req,res) =>{
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.get("/register", (req,res) =>{
   const user_id = req.cookies["user_id"] 
   const user = users[user_id]
   const templateVars = {
-  urls: urlDatabase,
-  user: user
-}
+    urls: urlDatabase,
+    user: user
+  }
 res.render("registration", templateVars)
 });
 
@@ -182,13 +182,21 @@ app.post("/register", (req,res) =>{
     res.redirect("/urls");
     
 });
+app.get("/login", (req, res) => {
+  const user_id = req.cookies["user_id"] 
+  const user = users[user_id]
+  const templateVars = {
+    user: user
+  }
+  
+  res.render("login", templateVars);
+});
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id
   const longURL = urlDatabase[id]
   res.redirect(longURL);
 });
-
 
 
 app.listen(PORT, () => {

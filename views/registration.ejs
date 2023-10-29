@@ -13,15 +13,24 @@
 
   <body>
     <%- include('partials/_header') %> 
-    <h1>Registration</h1>
-    <div class="card text-center">
-      <form method="POST" action="/register">
+    <h1> Create Account</h1>
+    <div class="">
       
-        <input type="email"  name="email"  />
-        <input type="password" name ="password" />
+      
+      <form method="POST" action="/register">
+        <div class="form-group">
+          <label>Email address</label>
+          <input type="email"  name="email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name ="password" placeholder="Password" />
+        </div>
         <button type="submit" class="btn btn-secondary">Register</button>
 
       </form>
+    
+    
     </div>
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
