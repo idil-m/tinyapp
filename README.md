@@ -8,12 +8,12 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 
 ###  **Instructions**
-*
-1. Create an account with a valid email address e.g(user@example.com) and with a password
-2.Proceed to Login
-3.To create a new shorten url, please click "Shorten a new URL"
-4.Enter URL and click 'Submit'
-5. A new Short Url Id will generate.
+
+- Create an account with a valid email address e.g(user@example.com) and with a password
+- Proceed to Login
+- To create a new shorten url, please click "Shorten a new URL"
+- Enter URL and click 'Submit'
+- A new Short Url Id will generate.
 
 ### **Features**
 
