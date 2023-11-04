@@ -52,7 +52,12 @@ const users = {
 app.use(express.urlencoded({ extended: true }));
 //Root route
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  const userId = req.session.userId;
+  const user = users[userId];
+  if (!user) {
+    return res.redirect("/login");
+  }
+  return res.redirect("/urls");
 });
 //Tester
 app.get("/hello", (req, res) => {
@@ -67,7 +72,7 @@ app.get("/urls", (req, res) => {
   const userId = req.session.userId;
   const user = users[userId];
   if (!user) {
-    res.redirect("/login");
+    return res.status(401).redirect("/login");
   }
   const userUrls = urlsForUser(userId,urlDatabase);
   const templateVars = {
@@ -75,7 +80,7 @@ app.get("/urls", (req, res) => {
     user: user
 
   };
-  res.render("urls_index", templateVars);
+  return res.render("urls_index", templateVars);
 });
 
 
@@ -83,14 +88,14 @@ app.get("/urls/new", (req, res) => {
   const userId = req.session.userId;
   const user = users[userId];
   if (!user) {
-    res.redirect("/login");
+    return res.redirect("/login");
   } else {
     const templateVars = {
       urls: urlDatabase,
       user: user
     
     };
-    res.render("urls_new", templateVars);
+    return res.render("urls_new", templateVars);
   }
 });
 
@@ -98,11 +103,16 @@ app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const userId = req.session.userId;
   const user = users[userId];
+  
   if (!user) {
     return res.redirect("/login");
-  } if (urlDatabase[id].userId !== userId) {
-    return res.status.send("You do not have permission to view this URL.");
   }
+  if (!urlDatabase[id]) {
+    return res.status(404).send("URL not found.");
+  } else if (urlDatabase[id].userId !== userId) {
+    return res.status(403).send("You do not have permission to view this URL.");
+  }
+
   const templateVars = {
     id:id,
     longURL: urlDatabase[id].longURL,
@@ -110,15 +120,15 @@ app.get("/urls/:id", (req, res) => {
     user: user
 
   };
-  res.render("urls_show", templateVars);
+  return res.render("urls_show", templateVars);
 });
 
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
+  
   const userId =  req.session.userId;
   if (!users[userId]) {
-    res.status(401).send("Log in to shorten URLs.");
+    return res.status(401).send("Log in to shorten URLs.");
   } else {
 
     const longuRL =  req.body.longURL;
@@ -126,8 +136,8 @@ app.post("/urls", (req, res) => {
 
     urlDatabase[shortId] = {longURL:longuRL, userId: userId };
 
-    console.log(longuRL);
-    res.redirect(`/urls/${shortId}`);
+    
+    return res.redirect(`/urls/${shortId}`);
   }
 });
 //Route to delete  URL
@@ -141,7 +151,7 @@ app.post("/urls/:id/delete", (req, res) =>{
     return res.status(403).send("Unauthroized to delete this URL.");
   }
   delete urlDatabase[id];
-  res.redirect("/urls");
+  return res.redirect("/urls");
 });
 //Route for updating an existing URL
 app.post("/urls/:id", (req, res) =>{
@@ -155,7 +165,7 @@ app.post("/urls/:id", (req, res) =>{
     return res.status(403).send("Unauthorized to edit this URL.");
   }
   urlDatabase[id].longURL = longURL;
-  res.redirect("/urls");
+  return res.redirect("/urls");
 });
 //Route for handling user login
 app.post("/login", (req, res) => {
@@ -167,12 +177,12 @@ app.post("/login", (req, res) => {
     return res.redirect("/urls");
 
   }
-  res.status(401).send("Invalid email or password.");
+  return res.status(401).send("Invalid email or password.");
 });
 //Route for handling user logout
 app.post("/logout", (req,res) =>{
   delete req.session.userId;
-  res.redirect("/login");
+  return res.redirect("/login");
 });
 //Route to display the reg page
 app.get("/register", (req,res) =>{
@@ -185,7 +195,7 @@ app.get("/register", (req,res) =>{
       urls: urlDatabase,
       user: user
     };
-    res.render("registration", templateVars);
+    return res.render("registration", templateVars);
   }
 });
 //Route for handling new user reg
@@ -207,23 +217,21 @@ app.post("/register", (req,res) =>{
     }
   }
   users[newUser.id] = newUser;
-  res.cookie("userId", newUser.id);
-  console.log(users);
+  req.session.userId = newUser.id;
   res.redirect("/urls");
-    
 });
 app.get("/login", (req, res) => {
   const userId = req.session.userId;
   const user = users[userId];
   
   if (user) {
-    res.redirect("/url");
+    return res.redirect("/urls");
   } else {
     const templateVars = {
       user: user
     };
 
-    res.render("login", templateVars);
+    return res.render("login", templateVars);
   }
 });
 
@@ -231,14 +239,14 @@ app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   const urlEntry = urlDatabase[id];
   if (!urlEntry) {
-    res.status(404).send("Shorten Url does not exist");
+    return res.status(404).send("Shorten Url does not exist");
   } else {
-    res.redirect(urlEntry.longURL);
+    return res.redirect(urlEntry.longURL);
   }
 });
 
 //Start the sever
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  
 });
 
